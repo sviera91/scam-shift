@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Scam Shift</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main id="app">
+
+    <!-- TITLE SCREEN -->
+    <section id="screen-title" class="screen active">
+      <h1 class="logo">SCAM<br />SHIFT</h1>
+      <p class="tagline">Shift+Verify before you trust.</p>
+      <p class="blurb">
+        You run the Maple Hollow Help Desk. Neighbors forward you strange texts,
+        emails and voicemails. Investigate. Verify. Protect the town without
+        blocking the real stuff.
+      </p>
+      <button id="btn-start" class="btn big">START SHIFT</button>
+      <details class="howto">
+        <summary>How to play</summary>
+        <ul>
+          <li>Press <kbd>SHIFT</kbd> (or click the tabs) to switch between <b>Message</b>, <b>History</b> and <b>Directory</b>.</li>
+          <li>Call trusted numbers from the Directory to verify. Calls cost time.</li>
+          <li>Decide: <b>LEGIT</b>, <b>IGNORE</b>, or <b>REPORT</b> the scam.</li>
+          <li>Letting scams through drains <b>Savings</b>. Blocking real messages costs <b>Trust</b>.</li>
+        </ul>
+      </details>
+    </section>
+
+    <!-- SHIFT INTRO -->
+    <section id="screen-intro" class="screen">
+      <h2 id="intro-title"></h2>
+      <p id="intro-text"></p>
+      <button id="btn-begin" class="btn big">OPEN THE DESK</button>
+    </section>
+
+    <!-- DESK (main gameplay) -->
+    <section id="screen-desk" class="screen">
+      <header class="hud">
+        <span id="hud-shift"></span>
+        <span>🕘 <b id="hud-clock"></b></span>
+        <span>🤝 Trust <b id="hud-trust"></b></span>
+        <span>💰 Savings <b id="hud-savings"></b></span>
+        <span id="hud-case"></span>
+      </header>
+
+      <div class="ticket">
+        <p id="ticket-resident"></p>
+      </div>
+
+      <nav class="tabs" role="tablist">
+        <button class="tab" data-view="message" role="tab">MESSAGE</button>
+        <button class="tab" data-view="history" role="tab">HISTORY</button>
+        <button class="tab" data-view="directory" role="tab">DIRECTORY</button>
+        <span class="hint">press <kbd>SHIFT</kbd> to switch</span>
+      </nav>
+
+      <div id="panel" class="panel" aria-live="polite"></div>
+
+      <footer class="actions">
+        <button class="btn good" data-decision="legit">LEGIT</button>
+        <button class="btn warn" data-decision="ignore">IGNORE</button>
+        <button class="btn bad" data-decision="report">REPORT SCAM</button>
+      </footer>
+    </section>
+
+    <!-- END OF SHIFT -->
+    <section id="screen-summary" class="screen">
+      <h2>SHIFT COMPLETE</h2>
+      <p id="summary-stars" class="stars"></p>
+      <p id="summary-stats"></p>
+      <h3>Field notes for real life</h3>
+      <ul id="summary-notes" class="notes"></ul>
+      <p class="small">
+        Got a scam message in real life? Report it at
+        <a href="https://reportfraud.ftc.gov/" target="_blank" rel="noopener">ReportFraud.ftc.gov</a>
+        and forward spam texts to 7726 (SPAM).
+      </p>
+      <button id="btn-restart" class="btn big">PLAY AGAIN</button>
+    </section>
+
+  </main>
+
+  <!-- DEBRIEF POPUP (shown after each decision) -->
+  <dialog id="debrief">
+    <h2 id="debrief-title"></h2>
+    <p id="debrief-outcome"></p>
+    <h3 id="debrief-tells-title"></h3>
+    <ul id="debrief-tells"></ul>
+    <p class="tip">💡 <span id="debrief-tip"></span></p>
+    <p class="small">Source: <a id="debrief-source" target="_blank" rel="noopener"></a></p>
+    <button id="btn-next" class="btn big">NEXT CASE</button>
+  </dialog>
+
+  <script src="cases.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
