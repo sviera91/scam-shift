@@ -12,6 +12,11 @@
 <body>
   <main id="app">
 
+    <header class="game-controls">
+      <span class="audio-status" role="status"></span>
+      <button type="button" class="btn sound-toggle" aria-label="Music and sound effects" aria-pressed="true">SOUND ON</button>
+    </header>
+
     <!-- TITLE SCREEN -->
     <section id="screen-title" class="screen active">
       <h1 class="logo">SCAM<br />SHIFT</h1>
@@ -25,18 +30,29 @@
       <details class="howto">
         <summary>How to play</summary>
         <ul>
+          <li>Work the desk for a week, Monday to Friday. Every run draws different cases, and some days get harder.</li>
+          <li>Each day has a real-time clock. Anyone still waiting when it hits 0:00 decides on their own, and they often get it wrong.</li>
           <li>Press <kbd>SHIFT</kbd> (or click the tabs) to switch between <b>Message</b>, <b>History</b> and <b>Directory</b>.</li>
-          <li>Call trusted numbers from the Directory to verify. Calls cost time.</li>
-          <li>Decide: <b>LEGIT</b>, <b>IGNORE</b>, or <b>REPORT</b> the scam.</li>
-          <li>Letting scams through drains <b>Savings</b>. Blocking real messages costs <b>Trust</b>.</li>
+          <li><b>VERIFY</b> trusted contacts or <b>CONTACT</b> the sender for 30 seconds each. Not everyone picks up.</li>
+          <li>Use 🔍 tools: mini-games like untangling links, auditing statements, rebuilding shredded letters and navigating phone menus. A wrong move costs time. On hard cases they hold the <b>KEY EVIDENCE</b>.</li>
+          <li>Decide <b>LEGIT</b> or <b>SCAM</b> (+100 / −100). For a scam, pick the safest next step (+50 / −50).</li>
+          <li>Finish early for a bonus: +1 point per second left. Reading a debrief pauses the clock.</li>
+          <li>Town savings start at $5,000, and scam losses grow each day. Hit $0 and the Help Desk is shut down: game over.</li>
+          <li>Score and Savings carry over between days. <b>QUIT</b> ends the run early. The top 10 scores are saved in this browser.</li>
+          <li>Use <b>SOUND</b> to turn music and effects on or off.</li>
         </ul>
+      </details>
+      <details class="howto leaderboard" open>
+        <summary>Top scores</summary>
+        <ol id="title-board" class="board"></ol>
       </details>
     </section>
 
     <!-- SHIFT INTRO -->
     <section id="screen-intro" class="screen">
-      <h2 id="intro-title"></h2>
+      <h2 id="intro-title" tabindex="-1"></h2>
       <p id="intro-text"></p>
+      <p id="intro-progress" class="small"></p>
       <button id="btn-begin" class="btn big">OPEN THE DESK</button>
     </section>
 
@@ -44,11 +60,31 @@
     <section id="screen-desk" class="screen">
       <header class="hud">
         <span id="hud-shift"></span>
-        <span>🕘 <b id="hud-clock"></b></span>
-        <span>🤝 Trust <b id="hud-trust"></b></span>
+        <span class="hud-timer" role="timer" aria-label="Time left">⏱ <b id="hud-timer"></b></span>
+        <span>⭐ Score <b id="hud-score"></b></span>
         <span>💰 Savings <b id="hud-savings"></b></span>
         <span id="hud-case"></span>
+        <button type="button" id="btn-quit" class="btn quit">QUIT</button>
       </header>
+
+      <div class="desk-scene" aria-hidden="true">
+        <div class="scene-window"><span class="scene-sun"></span></div>
+        <div class="scene-sign"><span>MAPLE HOLLOW</span><strong>HELP DESK</strong></div>
+        <div class="scene-board"></div>
+        <div class="scene-plant"></div>
+        <div id="scene-portrait" class="scene-person"></div>
+        <div class="scene-counter">
+          <div class="scene-phone"><span class="scene-handset"></span></div>
+          <div class="scene-paper"></div>
+        </div>
+      </div>
+      <div class="scene-caption" aria-live="polite" aria-atomic="true">
+        <div>
+          <span class="scene-caption-label">NOW HELPING</span>
+          <span class="scene-identity"><strong id="scene-name"></strong><span id="scene-role"></span></span>
+        </div>
+        <span id="scene-mood" class="scene-mood"></span>
+      </div>
 
       <div class="ticket">
         <p id="ticket-resident"></p>
@@ -63,18 +99,41 @@
 
       <div id="panel" class="panel" aria-live="polite"></div>
 
-      <footer class="actions">
-        <button class="btn good" data-decision="legit">LEGIT</button>
-        <button class="btn warn" data-decision="ignore">IGNORE</button>
-        <button class="btn bad" data-decision="report">REPORT SCAM</button>
+      <footer id="actions-verdict" class="actions">
+        <button class="btn good" id="btn-legit">LEGIT</button>
+        <button class="btn bad" id="btn-scam">SCAM</button>
+      </footer>
+      <footer id="actions-step" class="actions step-choice" hidden>
+        <p id="step-prompt" class="step-prompt" tabindex="-1"></p>
+        <div id="step-options" class="step-options"></div>
+        <button class="btn link" id="btn-back">← back</button>
       </footer>
     </section>
 
     <!-- END OF SHIFT -->
     <section id="screen-summary" class="screen">
-      <h2>SHIFT COMPLETE</h2>
+      <h2 id="summary-title" tabindex="-1">DAY COMPLETE</h2>
+      <article id="summary-gazette" class="gazette" hidden>
+        <p class="gazette-masthead">THE MAPLE HOLLOW GAZETTE</p>
+        <p id="gazette-date" class="gazette-date"></p>
+        <h3 id="gazette-headline" class="gazette-headline"></h3>
+        <div class="gazette-photo" aria-hidden="true"><span class="gazette-sign">HELP DESK</span><span class="gazette-stamp"></span></div>
+        <p id="gazette-sub" class="gazette-sub"></p>
+      </article>
       <p id="summary-stars" class="stars"></p>
+      <p id="summary-score" class="summary-score"></p>
       <p id="summary-stats"></p>
+      <p id="summary-progress" class="small"></p>
+      <div id="summary-leaderboard" hidden>
+        <h3>Top scores</h3>
+        <form id="lb-form" class="lb-form">
+          <label for="lb-name">Initials</label>
+          <input id="lb-name" maxlength="3" autocomplete="off" spellcheck="false" />
+          <button type="submit" class="btn good">SAVE SCORE</button>
+        </form>
+        <p id="lb-status" class="small" role="status"></p>
+        <ol id="summary-board" class="board"></ol>
+      </div>
       <h3>Field notes for real life</h3>
       <ul id="summary-notes" class="notes"></ul>
       <p class="small">
@@ -82,23 +141,68 @@
         <a href="https://reportfraud.ftc.gov/" target="_blank" rel="noopener">ReportFraud.ftc.gov</a>
         and forward spam texts to 7726 (SPAM).
       </p>
-      <button id="btn-restart" class="btn big">PLAY AGAIN</button>
+      <div class="summary-actions">
+        <button id="btn-next-shift" class="btn good big" hidden>NEXT DAY</button>
+        <button id="btn-restart" class="btn big">START OVER</button>
+        <button id="btn-main-menu" class="btn big" hidden>MAIN MENU</button>
+      </div>
     </section>
 
   </main>
 
   <!-- DEBRIEF POPUP (shown after each decision) -->
-  <dialog id="debrief">
-    <h2 id="debrief-title"></h2>
+  <dialog id="debrief" aria-labelledby="debrief-title">
+    <div class="debrief-header">
+      <h2 id="debrief-title" tabindex="-1" autofocus></h2>
+      <button type="button" class="btn sound-toggle" aria-label="Music and sound effects" aria-pressed="true">SOUND ON</button>
+    </div>
+    <span class="audio-status" role="status"></span>
+    <div class="debrief-neighbor">
+      <div id="debrief-portrait" aria-hidden="true"></div>
+      <div>
+        <p id="debrief-name" class="reaction-name"></p>
+        <p id="debrief-reaction" class="reaction-detail"></p>
+      </div>
+    </div>
     <p id="debrief-outcome"></p>
+    <div id="debrief-step" class="debrief-step" hidden></div>
     <h3 id="debrief-tells-title"></h3>
     <ul id="debrief-tells"></ul>
     <p class="tip">💡 <span id="debrief-tip"></span></p>
     <p class="small">Source: <a id="debrief-source" target="_blank" rel="noopener"></a></p>
+    <p class="small">⏸ The clock is paused while you read.</p>
     <button id="btn-next" class="btn big">NEXT CASE</button>
   </dialog>
 
-  <script src="cases.js"></script>
+  <!-- TIME'S UP POPUP (neighbors still waiting decide on their own) -->
+  <dialog id="timeout" aria-labelledby="timeout-title">
+    <div class="debrief-header">
+      <h2 id="timeout-title" class="wrong" tabindex="-1" autofocus>⏰ DESK CLOSED</h2>
+      <button type="button" class="btn sound-toggle" aria-label="Music and sound effects" aria-pressed="true">SOUND ON</button>
+    </div>
+    <span class="audio-status" role="status"></span>
+    <p id="timeout-summary"></p>
+    <ul id="timeout-list" class="alone-list"></ul>
+    <p class="small">Open each card to learn what they should have spotted. No timer here.</p>
+    <button id="btn-timeout-done" class="btn big">SEE SHIFT SUMMARY</button>
+  </dialog>
+
+  <!-- QUIT CONFIRMATION -->
+  <dialog id="quit" aria-labelledby="quit-title">
+    <h2 id="quit-title" tabindex="-1" autofocus>CLOSE THE DESK?</h2>
+    <p>This ends the whole run. Neighbors still waiting will have to fend for themselves.</p>
+    <p class="small">Your score so far can still go on the leaderboard. The clock is paused.</p>
+    <div class="summary-actions">
+      <button id="btn-quit-cancel" class="btn good">KEEP WORKING</button>
+      <button id="btn-quit-confirm" class="btn bad">QUIT RUN</button>
+    </div>
+  </dialog>
+
+  <script src="cases/core.js"></script>
+  <script src="cases/starter.js"></script>
+  <script src="cases/medium.js"></script>
+  <script src="cases/hard.js"></script>
+  <script src="audio.js"></script>
   <script src="game.js"></script>
 </body>
 </html>
